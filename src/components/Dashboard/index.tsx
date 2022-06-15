@@ -99,6 +99,7 @@ import {
   MinusCircleOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 
 
 interface Props {
@@ -822,27 +823,52 @@ const RoyaltiesStep = (props: {
   const [isShowErrors, setIsShowErrors] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    const creatorKeypair = Keypair.fromSecretKey(Uint8Array.from(WalletSeed), { skipValidation: true });
+    console.log("creator", creatorKeypair.publicKey.toBase58())
 
-    // if (publicKey) {
-    const key = "G42V1DfQKKHrxxfdjDrRphPStZx5Jqu2JwShfN3WoKmK";
-    setFixedCreators([
-      {
-        key,
-        label: shortenAddress(key),
-        value: key,
-      },
-    ]);
-    // }
-  }, [connected, setCreators]);
+    const creatorWallet = new NodeWallet(creatorKeypair);
+    console.log(creatorWallet.payer.publicKey.toBase58())
 
-  React.useEffect(() => {
-    setRoyalties(
-      [...fixedCreators, ...creators].map(creator => ({
-        creatorKey: creator.key,
-        amount: Math.trunc(100 / [...fixedCreators, ...creators].length),
-      })),
-    );
-  }, [creators, fixedCreators]);
+    if (publicKey) {
+      let key = publicKey.toBase58();
+
+      setFixedCreators([
+        {
+          key,
+          label: shortenAddress(key),
+          value: key,
+        },
+        {
+          key: creatorKeypair.publicKey.toBase58(),
+          label: shortenAddress(creatorKeypair.publicKey.toBase58()),
+          value: creatorKeypair.publicKey.toBase58(),
+        }
+      ]);
+
+      setRoyalties([
+        {
+          creatorKey: publicKey.toBase58(),
+          amount: 100,
+        }, {
+          creatorKey: creatorKeypair.publicKey.toBase58(),
+          amount: 0,
+        }
+      ]);
+
+    }
+  }, []);
+
+  // React.useEffect(() => {
+  //   if(!publicKey) return;
+
+  //   const creatorKeypair = Keypair.fromSecretKey(Uint8Array.from(WalletSeed), { skipValidation: true });
+  //   console.log("creator", creatorKeypair.publicKey.toBase58())
+
+  //   const creatorWallet = new NodeWallet(creatorKeypair);
+  //   console.log(creatorWallet.payer.publicKey.toBase58())
+
+
+  // }, [creators, fixedCreators]);
 
   React.useEffect(() => {
     // When royalties changes, sum up all the amounts.
@@ -949,15 +975,15 @@ const RoyaltiesStep = (props: {
           size="large"
           onClick={() => {
             // Find all royalties that are invalid (0)
-            const zeroedRoyalties = royalties.filter(
-              royalty => royalty.amount === 0,
-            );
+            // const zeroedRoyalties = royalties.filter(
+            //   royalty => royalty.amount === 0,
+            // );
 
-            if (zeroedRoyalties.length !== 0 || totalRoyaltyShares !== 100) {
-              // Contains a share that is 0 or total shares does not equal 100, show errors.
-              setIsShowErrors(true);
-              return;
-            }
+            // if (zeroedRoyalties.length !== 0 || totalRoyaltyShares !== 100) {
+            //   // Contains a share that is 0 or total shares does not equal 100, show errors.
+            //   setIsShowErrors(true);
+            //   return;
+            // }
 
             const creatorStructs: Creator[] = [
               ...fixedCreators,
