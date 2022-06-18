@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
+// @ts-ignore
 import * as BufferLayout from 'buffer-layout';
 
 /**

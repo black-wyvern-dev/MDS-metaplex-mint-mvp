@@ -70,7 +70,7 @@ export interface IMetadataExtension {
 
 export type WalletSigner = Pick<
     WalletAdapter,
-    'publicKey' | 'signTransaction' | 'signAllTransactions'
+    'publicKey'
 >;
 
 import { PublicKey, AccountInfo } from '@solana/web3.js';

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext } from 'react';
 
 import {
     Keypair,
@@ -17,7 +17,6 @@ import {
 
 import {
     TokenInfo,
-    TokenListProvider,
     ENV as ChainId,
 } from '@solana/spl-token-registry';
 
@@ -135,6 +134,7 @@ export const sendTransactionWithRetry = async (
         transaction.partialSign(...signers);
     }
     if (!includesFeePayer) {
+        // @ts-ignore
         transaction = await wallet.signTransaction(transaction);
     }
 

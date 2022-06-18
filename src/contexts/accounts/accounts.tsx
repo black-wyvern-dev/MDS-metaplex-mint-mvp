@@ -4,11 +4,12 @@ import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { AccountLayout, MintInfo, u64 } from '@solana/spl-token';
 import { useConnection } from '../../contexts/connection';
 import { TokenAccount } from '../models';
-import { StringPublicKey, WRAPPED_SOL_MINT } from '../../utils/ids';
+import { WRAPPED_SOL_MINT } from '../../utils/ids';
 import { programIds } from '../../utils/programIds';
 import { genericCache, cache } from './cache';
 import { deserializeAccount } from './deserialize';
 import { TokenAccountParser, MintParser } from './parsesrs';
+import { StringPublicKey } from 'utils';
 
 const AccountsContext = React.createContext<any>(null);
 
@@ -54,7 +55,7 @@ const UseNativeAccount = () => {
   const [nativeAccount, setNativeAccount] = useState<AccountInfo<Buffer>>();
 
   const updateCache = useCallback(
-    account => {
+    (account : any) => {
       if (publicKey) {
         const wrapped = wrapNativeAccount(publicKey.toBase58(), account);
         if (wrapped !== undefined) {

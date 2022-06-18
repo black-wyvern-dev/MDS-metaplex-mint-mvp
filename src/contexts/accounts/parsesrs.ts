@@ -1,5 +1,5 @@
 import { AccountInfo } from '@solana/web3.js';
-import { TokenAccount } from '../../models';
+import { TokenAccount } from '../models';
 import { ParsedAccountBase } from './types';
 import { deserializeMint, deserializeAccount } from './deserialize';
 import { StringPublicKey } from '../../utils';

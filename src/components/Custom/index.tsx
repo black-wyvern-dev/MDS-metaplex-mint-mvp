@@ -13,6 +13,7 @@ export const SolCircle = (props: { iconSize?: number }) => {
         display: 'inline-flex',
       }}
     >
+      {/* eslint-disable-next-line */}
       <img src="/sol-circle.svg" />
     </span>
   );

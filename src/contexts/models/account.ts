@@ -7,6 +7,7 @@ import {
 
 import { AccountInfo as TokenAccountInfo, Token } from '@solana/spl-token';
 import { TOKEN_PROGRAM_ID } from '../utils/ids';
+// @ts-ignore
 import BufferLayout from 'buffer-layout';
 
 export interface TokenAccount {

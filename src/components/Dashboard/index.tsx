@@ -158,6 +158,7 @@ export const Dashboard = (props: Props) => {
       image: attributes.image,
       animation_url: attributes.animation_url,
       attributes: attributes.attributes,
+      collection: wallet.publicKey?.toBase58(),
       external_url: attributes.external_url,
       properties: {
         files: attributes.properties.files,
@@ -184,6 +185,7 @@ export const Dashboard = (props: Props) => {
       if (_nft) setNft(_nft);
       setAlertMessage('');
     } catch (e: any) {
+      console.log(e.message);
       setAlertMessage(e.message);
     } finally {
       setMinting(false);
@@ -680,18 +682,18 @@ const InfoStep = (props: {
             <Form.List name="attributes">
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map(({ key, name, fieldKey }) => (
+                  {fields.map(({ key, name }) => (
                     <Space key={key} align="baseline">
                       <Form.Item
                         name={[name, 'trait_type']}
-                        fieldKey={[fieldKey, 'trait_type']}
+                        fieldKey={['trait_type']}
                         hasFeedback
                       >
                         <Input placeholder="trait_type (Optional)" />
                       </Form.Item>
                       <Form.Item
                         name={[name, 'value']}
-                        fieldKey={[fieldKey, 'value']}
+                        fieldKey={['value']}
                         rules={[{ required: true, message: 'Missing value' }]}
                         hasFeedback
                       >
@@ -699,7 +701,7 @@ const InfoStep = (props: {
                       </Form.Item>
                       <Form.Item
                         name={[name, 'display_type']}
-                        fieldKey={[fieldKey, 'display_type']}
+                        fieldKey={['display_type']}
                         hasFeedback
                       >
                         <Input placeholder="display_type (Optional)" />
@@ -823,11 +825,6 @@ const RoyaltiesStep = (props: {
   const [isShowErrors, setIsShowErrors] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    const creatorKeypair = Keypair.fromSecretKey(Uint8Array.from(WalletSeed), { skipValidation: true });
-    console.log("creator", creatorKeypair.publicKey.toBase58())
-
-    const creatorWallet = new NodeWallet(creatorKeypair);
-    console.log(creatorWallet.payer.publicKey.toBase58())
 
     if (publicKey) {
       let key = publicKey.toBase58();
@@ -838,21 +835,13 @@ const RoyaltiesStep = (props: {
           label: shortenAddress(key),
           value: key,
         },
-        {
-          key: creatorKeypair.publicKey.toBase58(),
-          label: shortenAddress(creatorKeypair.publicKey.toBase58()),
-          value: creatorKeypair.publicKey.toBase58(),
-        }
       ]);
 
       setRoyalties([
         {
-          creatorKey: publicKey.toBase58(),
+          creatorKey: key,
           amount: 100,
-        }, {
-          creatorKey: creatorKeypair.publicKey.toBase58(),
-          amount: 0,
-        }
+        },
       ]);
 
     }
