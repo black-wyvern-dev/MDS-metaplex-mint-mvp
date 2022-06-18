@@ -142,6 +142,7 @@ export const Dashboard = (props: Props) => {
 
   const gotoStep = React.useCallback(
     (_step: number) => {
+      console.log('+++++++++', _step); 
       setStep(_step);
       // if (_step === 0) setStepsVisible(true);
     },
@@ -186,9 +187,9 @@ export const Dashboard = (props: Props) => {
       setAlertMessage('');
     } catch (e: any) {
       console.log(e.message);
-      setAlertMessage(e.message);
+      // setAlertMessage(e.message);
     } finally {
-      setMinting(false);
+      // setMinting(false);
     }
   };
 
@@ -247,7 +248,7 @@ export const Dashboard = (props: Props) => {
           <LaunchStep
             attributes={attributes}
             files={files}
-            confirm={() => gotoStep(5)}
+            confirm={() => {gotoStep(5)}}
             connection={solConnection}
           />
         )}
@@ -1195,7 +1196,12 @@ const WaitingStep = (props: {
   confirm: Function;
   step: number;
 }) => {
+  console.log('====lllll=====')
+  const [started, setStarted] = React.useState<boolean>(false);
   React.useEffect(() => {
+    if (started) return;
+    console.log('========', started)
+    setStarted(true);
     const func = async () => {
       await props.mint();
       props.confirm();
