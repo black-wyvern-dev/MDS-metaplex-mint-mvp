@@ -28,11 +28,6 @@ const Home: NextPage = (props) => {
         handleDrawerToggle={handleDrawerToggle}
         handlerSearchAddress={(e) => handlerSearchAddress(e)}
       />
-      {/* <SideBar
-        drawerWidth={drawerWidth}
-        mobileOpen={mobileOpen}
-        handleDrawerToggle={handleDrawerToggle}
-      /> */}
       <MainPanel
         drawerWidth={drawerWidth}
       >

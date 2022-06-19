@@ -99,7 +99,6 @@ import {
   MinusCircleOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 
 
 interface Props {
@@ -142,7 +141,6 @@ export const Dashboard = (props: Props) => {
 
   const gotoStep = React.useCallback(
     (_step: number) => {
-      console.log('+++++++++', _step); 
       setStep(_step);
       // if (_step === 0) setStepsVisible(true);
     },
@@ -159,7 +157,6 @@ export const Dashboard = (props: Props) => {
       image: attributes.image,
       animation_url: attributes.animation_url,
       attributes: attributes.attributes,
-      collection: wallet.publicKey?.toBase58(),
       external_url: attributes.external_url,
       properties: {
         files: attributes.properties.files,
@@ -186,10 +183,9 @@ export const Dashboard = (props: Props) => {
       if (_nft) setNft(_nft);
       setAlertMessage('');
     } catch (e: any) {
-      console.log(e.message);
-      // setAlertMessage(e.message);
+      setAlertMessage(e.message);
     } finally {
-      // setMinting(false);
+      setMinting(false);
     }
   };
 
@@ -248,7 +244,7 @@ export const Dashboard = (props: Props) => {
           <LaunchStep
             attributes={attributes}
             files={files}
-            confirm={() => {gotoStep(5)}}
+            confirm={() => gotoStep(5)}
             connection={solConnection}
           />
         )}
@@ -683,18 +679,19 @@ const InfoStep = (props: {
             <Form.List name="attributes">
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map(({ key, name }) => (
+                {/* @ts-ignore */}
+                  {fields.map(({ key, name, fieldKey }) => (
                     <Space key={key} align="baseline">
                       <Form.Item
                         name={[name, 'trait_type']}
-                        fieldKey={['trait_type']}
+                        fieldKey={[fieldKey, 'trait_type']}
                         hasFeedback
                       >
                         <Input placeholder="trait_type (Optional)" />
                       </Form.Item>
                       <Form.Item
                         name={[name, 'value']}
-                        fieldKey={['value']}
+                        fieldKey={[fieldKey, 'value']}
                         rules={[{ required: true, message: 'Missing value' }]}
                         hasFeedback
                       >
@@ -702,7 +699,7 @@ const InfoStep = (props: {
                       </Form.Item>
                       <Form.Item
                         name={[name, 'display_type']}
-                        fieldKey={['display_type']}
+                        fieldKey={[fieldKey, 'display_type']}
                         hasFeedback
                       >
                         <Input placeholder="display_type (Optional)" />
@@ -828,37 +825,25 @@ const RoyaltiesStep = (props: {
   React.useEffect(() => {
 
     if (publicKey) {
-      let key = publicKey.toBase58();
-
-      setFixedCreators([
-        {
-          key,
-          label: shortenAddress(key),
-          value: key,
-        },
-      ]);
-
-      setRoyalties([
-        {
-          creatorKey: key,
-          amount: 100,
-        },
-      ]);
-
+    const key = publicKey.toBase58();
+    setFixedCreators([
+      {
+        key,
+        label: shortenAddress(key),
+        value: key,
+      },
+    ]);
     }
-  }, []);
+  }, [connected, setCreators]);
 
-  // React.useEffect(() => {
-  //   if(!publicKey) return;
-
-  //   const creatorKeypair = Keypair.fromSecretKey(Uint8Array.from(WalletSeed), { skipValidation: true });
-  //   console.log("creator", creatorKeypair.publicKey.toBase58())
-
-  //   const creatorWallet = new NodeWallet(creatorKeypair);
-  //   console.log(creatorWallet.payer.publicKey.toBase58())
-
-
-  // }, [creators, fixedCreators]);
+  React.useEffect(() => {
+    setRoyalties(
+      [...fixedCreators, ...creators].map(creator => ({
+        creatorKey: creator.key,
+        amount: Math.trunc(100 / [...fixedCreators, ...creators].length),
+      })),
+    );
+  }, [creators, fixedCreators]);
 
   React.useEffect(() => {
     // When royalties changes, sum up all the amounts.
@@ -965,15 +950,15 @@ const RoyaltiesStep = (props: {
           size="large"
           onClick={() => {
             // Find all royalties that are invalid (0)
-            // const zeroedRoyalties = royalties.filter(
-            //   royalty => royalty.amount === 0,
-            // );
+            const zeroedRoyalties = royalties.filter(
+              royalty => royalty.amount === 0,
+            );
 
-            // if (zeroedRoyalties.length !== 0 || totalRoyaltyShares !== 100) {
-            //   // Contains a share that is 0 or total shares does not equal 100, show errors.
-            //   setIsShowErrors(true);
-            //   return;
-            // }
+            if (zeroedRoyalties.length !== 0 || totalRoyaltyShares !== 100) {
+              // Contains a share that is 0 or total shares does not equal 100, show errors.
+              setIsShowErrors(true);
+              return;
+            }
 
             const creatorStructs: Creator[] = [
               ...fixedCreators,
@@ -1196,12 +1181,7 @@ const WaitingStep = (props: {
   confirm: Function;
   step: number;
 }) => {
-  console.log('====lllll=====')
-  const [started, setStarted] = React.useState<boolean>(false);
   React.useEffect(() => {
-    if (started) return;
-    console.log('========', started)
-    setStarted(true);
     const func = async () => {
       await props.mint();
       props.confirm();

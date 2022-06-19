@@ -12,6 +12,7 @@ import {
   CreateMetadataV2Args,
   DataV2,
   UpdateMetadataV2Args,
+  MetadataData,
 } from '@metaplex-foundation/mpl-token-metadata';
 
 export const METADATA_PREFIX = 'metadata';
