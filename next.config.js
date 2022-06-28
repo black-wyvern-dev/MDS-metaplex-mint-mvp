@@ -30,7 +30,7 @@ const plugins = [
 
 const nextConfig = {
   distDir: "build",
-  swcMinify: false,
+  swcMinify: true,
   publicRuntimeConfig: {
     network: 'devnet'
   },
@@ -40,7 +40,7 @@ const nextConfig = {
       // FIX this
       // Disable minimize to make it work with Candy Machine template
       // minimization brakes Public Key names
-      config.optimization.minimize = true;
+      config.optimization.minimize = false;
     }
     return config;
   },
