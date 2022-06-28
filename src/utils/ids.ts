@@ -1,6 +1,5 @@
 import { PublicKey, AccountInfo } from '@solana/web3.js';
-
-export type StringPublicKey = string;
+import { StringPublicKey } from './type';
 
 export class LazyAccountInfoProxy<T> {
     executable: boolean = false;

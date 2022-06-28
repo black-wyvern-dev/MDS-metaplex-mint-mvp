@@ -3,13 +3,18 @@ import {
   useWallet,
   WalletProvider as BaseWalletProvider,
 } from '@solana/wallet-adapter-react';
-
+import {
+  getLedgerWallet,
+  getMathWallet,
+  getPhantomWallet,
+  getSlopeWallet,
+  getSolflareWallet,
+  getSolletWallet,
+  getSolongWallet,
+} from '@solana/wallet-adapter-wallets';
 import { Button, Collapse } from 'antd';
 import React, {
   createContext,
-  FC,
-  ReactNode,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -34,5 +39,6 @@ export function useWalletModal(): WalletModalContextState {
 
 export type WalletSigner = Pick<
   WalletAdapter,
-  any
+  // @ts-ignore
+  'publicKey' | 'signTransaction' | 'signAllTransactions'
 >;

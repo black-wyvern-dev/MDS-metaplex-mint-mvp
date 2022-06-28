@@ -68,11 +68,15 @@ export interface IMetadataExtension {
     };
 }
 
+export type WalletSigner = Pick<
+    WalletAdapter,
+    // @ts-ignore
+    'publicKey' | 'signTransaction' | 'signAllTransactions'
+>;
 
 import { PublicKey, AccountInfo } from '@solana/web3.js';
 
-type StringPublicKey = string;
-
+export type StringPublicKey = string;
 
 const PubKeysInternedMap = new Map<string, PublicKey>();
 

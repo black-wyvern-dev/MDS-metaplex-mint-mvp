@@ -14,7 +14,6 @@ import {
   WalletModalProvider,
   WalletMultiButton,
 } from '@solana/wallet-adapter-react-ui';
-require('@solana/wallet-adapter-react-ui/styles.css');
 
 interface Props {
   drawerWidth: number;

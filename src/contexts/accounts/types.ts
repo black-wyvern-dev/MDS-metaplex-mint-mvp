@@ -15,3 +15,8 @@ export type AccountParser = (
 export interface ParsedAccount<T> extends ParsedAccountBase {
   info: T;
 }
+
+export type AccountAndPubkey = {
+  pubkey: string;
+  account: AccountInfo<Buffer>;
+};

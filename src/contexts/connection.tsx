@@ -135,7 +135,8 @@ export const sendTransactionWithRetry = async (
         transaction.partialSign(...signers);
     }
     if (!includesFeePayer) {
-        transaction = await (wallet as any).signTransaction(transaction);
+        // @ts-ignore
+        transaction = await wallet.signTransaction(transaction);
     }
 
     if (beforeSend) {

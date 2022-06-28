@@ -99,7 +99,6 @@ import {
   MinusCircleOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 
 
 interface Props {
@@ -152,7 +151,6 @@ export const Dashboard = (props: Props) => {
     const metadata = {
       name: attributes.name,
       symbol: attributes.symbol,
-      collection: wallet.publicKey?.toBase58(),
       creators: attributes.creators,
       description: attributes.description,
       sellerFeeBasisPoints: attributes.seller_fee_basis_points,
@@ -681,16 +679,19 @@ const InfoStep = (props: {
             <Form.List name="attributes">
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map(({ key, name }) => (
+                {/* @ts-ignore */}
+                  {fields.map(({ key, name, fieldKey }) => (
                     <Space key={key} align="baseline">
                       <Form.Item
                         name={[name, 'trait_type']}
+                        fieldKey={[fieldKey, 'trait_type']}
                         hasFeedback
                       >
                         <Input placeholder="trait_type (Optional)" />
                       </Form.Item>
                       <Form.Item
                         name={[name, 'value']}
+                        fieldKey={[fieldKey, 'value']}
                         rules={[{ required: true, message: 'Missing value' }]}
                         hasFeedback
                       >
@@ -698,6 +699,7 @@ const InfoStep = (props: {
                       </Form.Item>
                       <Form.Item
                         name={[name, 'display_type']}
+                        fieldKey={[fieldKey, 'display_type']}
                         hasFeedback
                       >
                         <Input placeholder="display_type (Optional)" />
@@ -821,44 +823,27 @@ const RoyaltiesStep = (props: {
   const [isShowErrors, setIsShowErrors] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    const creatorKeypair = Keypair.fromSecretKey(Uint8Array.from(WalletSeed), { skipValidation: true });
-    console.log("creator", creatorKeypair.publicKey.toBase58())
-
-    const creatorWallet = new NodeWallet(creatorKeypair);
-    console.log(creatorWallet.payer.publicKey.toBase58())
 
     if (publicKey) {
-      let key = publicKey.toBase58();
-
-      setFixedCreators([
-        {
-          key,
-          label: shortenAddress(key),
-          value: key,
-        }
-      ]);
-
-      setRoyalties([
-        {
-          creatorKey: publicKey.toBase58(),
-          amount: 100,
-        }
-      ]);
-
+    const key = publicKey.toBase58();
+    setFixedCreators([
+      {
+        key,
+        label: shortenAddress(key),
+        value: key,
+      },
+    ]);
     }
-  }, []);
+  }, [connected, setCreators]);
 
-  // React.useEffect(() => {
-  //   if(!publicKey) return;
-
-  //   const creatorKeypair = Keypair.fromSecretKey(Uint8Array.from(WalletSeed), { skipValidation: true });
-  //   console.log("creator", creatorKeypair.publicKey.toBase58())
-
-  //   const creatorWallet = new NodeWallet(creatorKeypair);
-  //   console.log(creatorWallet.payer.publicKey.toBase58())
-
-
-  // }, [creators, fixedCreators]);
+  React.useEffect(() => {
+    setRoyalties(
+      [...fixedCreators, ...creators].map(creator => ({
+        creatorKey: creator.key,
+        amount: Math.trunc(100 / [...fixedCreators, ...creators].length),
+      })),
+    );
+  }, [creators, fixedCreators]);
 
   React.useEffect(() => {
     // When royalties changes, sum up all the amounts.
@@ -965,15 +950,15 @@ const RoyaltiesStep = (props: {
           size="large"
           onClick={() => {
             // Find all royalties that are invalid (0)
-            // const zeroedRoyalties = royalties.filter(
-            //   royalty => royalty.amount === 0,
-            // );
+            const zeroedRoyalties = royalties.filter(
+              royalty => royalty.amount === 0,
+            );
 
-            // if (zeroedRoyalties.length !== 0 || totalRoyaltyShares !== 100) {
-            //   // Contains a share that is 0 or total shares does not equal 100, show errors.
-            //   setIsShowErrors(true);
-            //   return;
-            // }
+            if (zeroedRoyalties.length !== 0 || totalRoyaltyShares !== 100) {
+              // Contains a share that is 0 or total shares does not equal 100, show errors.
+              setIsShowErrors(true);
+              return;
+            }
 
             const creatorStructs: Creator[] = [
               ...fixedCreators,
@@ -983,9 +968,9 @@ const RoyaltiesStep = (props: {
                 new Creator({
                   address: c.value,
                   verified: c.value === publicKey?.toBase58(),
-                  share: c.value === publicKey?.toBase58() ? 100 : 0,
-                  // royalties.find(r => r.creatorKey === c.value)?.amount ||
-                  // Math.round(100 / royalties.length),
+                  share:
+                    royalties.find(r => r.creatorKey === c.value)?.amount ||
+                    Math.round(100 / royalties.length),
                 }),
             );
 

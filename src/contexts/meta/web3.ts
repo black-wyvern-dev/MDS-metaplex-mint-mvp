@@ -1,6 +1,6 @@
 import { AccountInfo, Connection } from '@solana/web3.js';
-import { StringPublicKey } from '../../utils/ids';
-import { AccountAndPubkey } from './types';
+import { AccountAndPubkey } from 'contexts/accounts';
+import { StringPublicKey } from '../../utils';
 
 export async function getProgramAccounts(
   connection: Connection,
