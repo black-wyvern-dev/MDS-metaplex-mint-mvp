@@ -679,7 +679,7 @@ const InfoStep = (props: {
             <Form.List name="attributes">
               {(fields, { add, remove }) => (
                 <>
-                {/* @ts-ignore */}
+                  {/* @ts-ignore */}
                   {fields.map(({ key, name, fieldKey }) => (
                     <Space key={key} align="baseline">
                       <Form.Item
@@ -822,17 +822,28 @@ const RoyaltiesStep = (props: {
   const [showCreatorsModal, setShowCreatorsModal] = React.useState<boolean>(false);
   const [isShowErrors, setIsShowErrors] = React.useState<boolean>(false);
 
+  const [newCreator, setNewCreator] = React.useState('');
+
+  const newCreatorChangeHandler = (value: string) => {
+    setNewCreator(value);
+  }
+
+  const addCreator = () => {
+    setCreators([...creators, { key: newCreator, label: shortenAddress(newCreator), value: newCreator } as UserValue])
+    setShowCreatorsModal(false)
+  }
+
   React.useEffect(() => {
 
     if (publicKey) {
-    const key = publicKey.toBase58();
-    setFixedCreators([
-      {
-        key,
-        label: shortenAddress(key),
-        value: key,
-      },
-    ]);
+      const key = publicKey.toBase58();
+      setFixedCreators([
+        {
+          key,
+          label: shortenAddress(key),
+          value: key,
+        },
+      ]);
     }
   }, [connected, setCreators]);
 
@@ -885,7 +896,7 @@ const RoyaltiesStep = (props: {
           />
         </label>
       </Row>
-      {false && [...fixedCreators, ...creators].length > 0 && (
+      {[...fixedCreators, ...creators].length > 0 && (
         <Row>
           <label className="action-field" style={{ width: '100%' }}>
             <span className="field-title">Creators Split</span>
@@ -903,39 +914,51 @@ const RoyaltiesStep = (props: {
         </Row>
       )}
       {
-        false &&
+
         <Row>
-          <span
-            onClick={() => setShowCreatorsModal(true)}
-            style={{ padding: 10, marginBottom: 10 }}
-          >
+          {
+            !showCreatorsModal &&
             <span
-              style={{
-                color: 'white',
-                fontSize: 25,
-                padding: '0px 8px 3px 8px',
-                background: 'rgb(57, 57, 57)',
-                borderRadius: '50%',
-                marginRight: 5,
-                verticalAlign: 'middle',
-              }}
+              onClick={() => setShowCreatorsModal(true)}
+              style={{ padding: 10, marginBottom: 10 }}
             >
-              +
+              <span
+                style={{
+                  color: 'white',
+                  fontSize: 25,
+                  padding: '0px 8px 3px 8px',
+                  background: 'rgb(57, 57, 57)',
+                  borderRadius: '50%',
+                  marginRight: 5,
+                  verticalAlign: 'middle',
+                }}
+              >
+                +
+              </span>
+              <span
+                style={{
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  verticalAlign: 'middle',
+                  lineHeight: 1,
+                }}
+              >
+                Add another creator
+              </span>
             </span>
-            <span
-              style={{
-                color: 'rgba(255, 255, 255, 0.7)',
-                verticalAlign: 'middle',
-                lineHeight: 1,
-              }}
-            >
-              Add another creator
-            </span>
-          </span>
+
+          }
+          {
+            showCreatorsModal &&
+            <>
+              <input type="text" value={newCreator} onChange={(e) => newCreatorChangeHandler(e.target.value)} />
+              <button className="height-p50" onClick={() => addCreator()}>Add</button>
+              <button className="height-p50" onClick={() => setShowCreatorsModal(false)}>Cencel</button>
+            </>
+          }
 
         </Row>
       }
-      {false && isShowErrors && totalRoyaltyShares !== 100 && (
+      {isShowErrors && totalRoyaltyShares !== 100 && (
         <Row>
           <Text  >
             {/* style={{ paddingBottom: "14px" }} */}
@@ -981,6 +1004,12 @@ const RoyaltiesStep = (props: {
             if (share > 100 && creatorStructs.length) {
               creatorStructs[0].share -= share - 100;
             }
+            console.log({
+              ...props.attributes,
+              creators: creatorStructs,
+            })
+            console.log(royalties, "royalties")
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             props.setAttributes({
               ...props.attributes,
               creators: creatorStructs,
@@ -1005,7 +1034,7 @@ const RoyaltiesSplitter = (props: {
 }) => {
   return (
     <Col>
-      <Row gutter={[0, 24]}>
+      <Col>
         {props.creators.map((creator, idx) => {
           const royalty = props.royalties.find(
             royalty => royalty.creatorKey === creator.key,
@@ -1063,7 +1092,7 @@ const RoyaltiesSplitter = (props: {
             </Col>
           );
         })}
-      </Row>
+      </Col>
     </Col>
   );
 };
