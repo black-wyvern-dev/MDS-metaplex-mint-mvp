@@ -145,9 +145,13 @@ export const mintNFT = async (
                 };
             }),
         },
-        collection: metadata.collection
-            ? new PublicKey(metadata.collection).toBase58()
-            : null,
+        collection: {
+            name: '7DS',
+            family: 'SevenDeadlySins',
+        },
+        // collection: metadata.collection
+        //     ? new PublicKey(metadata.collection).toBase58()
+        //     : null,
         use: metadata.uses ? metadata.uses : null,
     };
 
